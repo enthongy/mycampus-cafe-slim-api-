@@ -23,14 +23,8 @@ WORKDIR /var/www/html
 # Copy all application files
 COPY . .
 
-# Install PHP dependencies (including firebase/php-jwt)
-RUN composer install --no-dev --optimize-autoloader
-
-# Ensure JWT package is explicitly installed (safety net)
-RUN composer require firebase/php-jwt --no-dev --optimize-autoloader || true
-
-# Dump autoloader to regenerate classmap
-RUN composer dump-autoload --optimize
+# Update dependencies (regenerates lock file) and install them
+RUN composer update --no-dev --optimize-autoloader
 
 # Set Apache document root to public folder
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
