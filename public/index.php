@@ -17,15 +17,7 @@ $app->addBodyParsingMiddleware();
 $app->addRoutingMiddleware();
 $app->addErrorMiddleware(true, true, true);
 
-// ---------- CORS (OPTIONS) ----------
-$app->options('/{routes:.+}', function (Request $request, Response $response) {
-    return $response
-        ->withHeader('Access-Control-Allow-Origin', '*')
-        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-        ->withHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-});
-
-// ---------- CORS (GLOBAL) ----------
+// ---------- GLOBAL CORS MIDDLEWARE (Handles all responses, including OPTIONS) ----------
 $app->add(function (Request $request, RequestHandler $handler): Response {
     $response = $handler->handle($request);
     return $response
@@ -226,8 +218,8 @@ $app->get('/test-auth', function (Request $request, Response $response) {
     ]);
 });
 
-// ---------- CATCH-ALL (404) ----------
-$app->map(['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], '/{routes:.+}', function (Request $request, Response $response) {
+// ---------- CATCH-ALL (404) – Exclude OPTIONS to avoid duplicate ----------
+$app->map(['GET', 'POST', 'PUT', 'DELETE'], '/{routes:.+}', function (Request $request, Response $response) {
     return jsonResponse($response, ['error' => 'Route not found'], 404);
 });
 
